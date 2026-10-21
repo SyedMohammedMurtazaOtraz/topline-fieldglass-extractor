@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fieldglass Extractor · TopLine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ───────────── Sign in (split screen) ───────────── -->
+  <section id="login" class="login" hidden>
+    <div class="login-brand">
+      <div class="brand-mark">TL</div>
+      <div class="brand-copy">
+        <p class="eyebrow">TopLine · Otraz Workspace</p>
+        <h1>Fieldglass Extractor</h1>
+        <p>Upload an employee's documents — Emirates ID, residence visa, passport, ADNOC medical, HSE induction and H2S certificates — and get their Fieldglass row filled, checked and ready.</p>
+        <ul class="brand-points">
+          <li>Reads scans, photos and PDFs</li>
+          <li>Cross-checks IDs, dates and expiries</li>
+          <li>Writes straight into the Fieldglass sheet</li>
+        </ul>
+      </div>
+      <p class="brand-foot">Built by Otraz Technologies</p>
+    </div>
+    <div class="login-form-wrap">
+      <form id="loginForm" class="login-form" autocomplete="on">
+        <h2>Sign in</h2>
+        <p class="muted">Use your TopLine workspace account.</p>
+        <label>Email<input id="email" type="email" required autocomplete="username" placeholder="hr@toplineme.com" /></label>
+        <label>Password<input id="password" type="password" required autocomplete="current-password" /></label>
+        <p id="loginError" class="form-error" role="alert"></p>
+        <button class="btn primary wide" type="submit" id="loginBtn">Sign in</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ───────────── App ───────────── -->
+  <section id="app" class="app" hidden>
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand-mark sm">TL</div>
+        <div>
+          <strong>Fieldglass Extractor</strong>
+          <span class="muted small" id="who"></span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="wb-pill" title="Workbook rows are written into">
+          <span class="dot"></span><span id="wbName">Fieldglass template</span>
+          <span class="muted small" id="wbCount"></span>
+        </div>
+        <button class="btn ghost" id="loadMasterBtn">Load master sheet</button>
+        <input type="file" id="masterInput" accept=".xlsx" hidden />
+        <button class="btn" id="downloadWbBtn" disabled>Download workbook</button>
+        <button class="btn ghost" id="logoutBtn">Sign out</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar">
+        <div class="side-head">
+          <h3>Employees</h3>
+          <button class="btn sm" id="newEmpBtn">+ New</button>
+        </div>
+        <ul id="empList" class="emp-list"></ul>
+        <p class="muted small side-hint">Drop one employee's files, or a zip/folder with one sub-folder per employee to queue several at once.</p>
+      </aside>
+
+      <section class="content">
+        <!-- Upload -->
+        <div id="uploadView" class="card upload-card">
+          <div id="dropzone" class="dropzone" tabindex="0">
+            <div class="dz-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4m0 0-4 4m4-4 4 4"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+            </div>
+            <h2>Drop the employee's documents here</h2>
+            <p class="muted">PDF, JPG or PNG — or a .zip / folder. Expected: Emirates ID, Residence Visa, Passport, ADNOC Medical, HSE Induction, H2S.</p>
+            <div class="dz-actions">
+              <button class="btn primary" id="pickFilesBtn">Choose files</button>
+              <button class="btn" id="pickFolderBtn">Choose folder</button>
+            </div>
+            <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.zip" hidden />
+            <input type="file" id="folderInput" webkitdirectory multiple hidden />
+          </div>
+        </div>
+
+        <!-- Employee workspace -->
+        <div id="empView" hidden>
+          <div class="emp-head">
+            <div>
+              <p class="eyebrow" id="empFolder"></p>
+              <h2 id="empTitle">Employee</h2>
+            </div>
+            <div class="emp-actions">
+              <button class="btn" id="singleXlsxBtn" disabled>Excel for this employee</button>
+              <button class="btn primary" id="addRowBtn" disabled>Add to workbook</button>
+            </div>
+          </div>
+          <p id="rowNote" class="row-note" hidden></p>
+
+          <div class="grid2">
+            <div class="card">
+              <div class="card-head"><h3>Documents</h3><span class="muted small" id="docProgress"></span></div>
+              <ul id="docList" class="doc-list"></ul>
+              <button class="btn sm ghost" id="addMoreBtn">+ Add more files</button>
+              <input type="file" id="moreInput" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" hidden />
+            </div>
+            <div class="card">
+              <div class="card-head"><h3>Checks</h3><span id="checkBadge" class="badge"></span></div>
+              <ul id="issueList" class="issue-list"></ul>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Review &amp; correct</h3>
+              <div class="legend small">
+                <span><i class="lg ok"></i>From documents</span>
+                <span><i class="lg warn"></i>Check</span>
+                <span><i class="lg error"></i>Problem / missing</span>
+                <span><i class="lg manual"></i>Default — confirm</span>
+              </div>
+            </div>
+            <div id="form" class="form"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </section>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script src="vendor/pdf.min.js"></script>
+  <script src="vendor/jszip.min.js"></script>
+  <script src="vendor/exceljs.min.js"></script>
+  <script src="merge.js"></script>
+  <script src="excel.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

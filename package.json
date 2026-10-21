@@ -1,0 +1,10 @@
+{
+  "name": "topline-fieldglass-extractor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TopLine Fieldglass Extractor — reads employee documents with AI and fills the Fieldglass sheet. Built by Otraz Technologies.",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev"
+  }
+}
